@@ -1,3 +1,4 @@
+# JavaScript library for working with ClearQuest OSLC API [![Build Status](https://travis-ci.org/navngoyahcl/cq-utils.svg?branch=master)](https://travis-ci.org/navngoyahcl/cq-utils)
 ## Functions
 
 <dl>
