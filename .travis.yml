@@ -5,4 +5,4 @@ node_js:
   - v5
 before_script:
   - npm install -g gulp-cli
-script: gulp coveralls
+script: npm test
