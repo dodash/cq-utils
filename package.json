@@ -1,0 +1,41 @@
+{
+  "name": "cq-utils",
+  "version": "1.0.0",
+  "description": "JavaScript library for working with ClearQuest OSLC API",
+  "main": "src/cqutil.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "gulp test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/navngoyahcl/cq-utils.git"
+  },
+  "keywords": [
+    "ClearQuest",
+    "cq",
+    "oslc"
+  ],
+  "author": "HCL Technologies Ltd.",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/navngoyahcl/cq-utils/issues"
+  },
+  "homepage": "https://github.com/navngoyahcl/cq-utils#readme",
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "gulp": "^3.9.1",
+    "karma": "^2.0.2",
+    "karma-chai": "^0.1.0",
+    "karma-chrome-launcher": "^2.2.0",
+    "karma-coverage": "^1.1.2",
+    "karma-mocha": "^1.3.0",
+    "karma-sinon": "^1.0.5",
+    "karma-sinon-chai": "^1.3.4",
+    "mocha": "^5.1.1",
+    "sinon": "^5.0.7",
+    "sinon-chai": "^3.0.0"
+  }
+}
