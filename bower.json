@@ -1,0 +1,22 @@
+{
+  "name": "cq-utils",
+  "description": "JavaScript library for working with ClearQuest OSLC API",
+  "main": "src/cqutil.js",
+  "authors": [
+    "HCL Technologies Ltd."
+  ],
+  "license": "ISC",
+  "keywords": [
+    "ClearQuest",
+    "cq",
+    "oslc"
+  ],
+  "homepage": "https://github.com/navngoyahcl/cq-utils",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

@@ -178,9 +178,11 @@ function doGet(url, callback, isOSLCv2) {
 function doGetXML(url, callback, isOSLCv2) {
     DEBUG&&console.log("doGetXML url isOSLCv2", url, isOSLCv2);
     var params = initParams(isOSLCv2);
+    console.log("doGetXML params1", params);
     params[gadgets.io.RequestParameters.HEADERS].Accept = "application/xml";
     params[gadgets.io.RequestParameters.METHOD] = gadgets.io.MethodType.GET;
     DEBUG&&console.log("doGetXML params[gadgets.io.RequestParameters.HEADERS].Accept", params[gadgets.io.RequestParameters.HEADERS].Accept);
+    console.log("doGetXML params2", params);
     makeRequest(url, callback, params);
 }
 
@@ -659,9 +661,19 @@ function loadPrefs(){
 }
 
 if(typeof exports !== 'undefined') {
-    exports.loadPrefs = loadPrefs;
     exports.getBasePath = getBasePath;
     exports.adjustHeight = adjustHeight;
     exports.setVisibilityOf = setVisibilityOf;
-    exports.setLoading = setLoading;
+    exports.getRepoNameFromDbUrl = getRepoNameFromDbUrl;
+    exports.getDbNameFromDbUrl = getDbNameFromDbUrl;
+    exports.getRecordPreviewHtml = getRecordPreviewHtml;
+    exports.doGet = doGet;
+	exports.doGetXML = doGetXML;
+	exports.doPost = doPost;
+	exports.getOAuthFriendsApiUrl = getOAuthFriendsApiUrl;
+	exports.checkIfFTSenabled = checkIfFTSenabled;
+    exports.getSchemaRepositories = getSchemaRepositories;
+    exports.getUserDatabases = getUserDatabases;
+    exports.getRecordTypes = getRecordTypes;
+    exports.getRecord = getRecord;
 }
