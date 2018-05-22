@@ -15,3 +15,8 @@ gulp.task('tdd', function(done){
 		configFile: __dirname + '/karma.conf.js',
 	}, done).start();
 });
+
+gulp.task('coveralls', ['test'], function() {
+	gulp.src('coverage/**/lcov.info')
+	.pipe(coveralls());
+});
