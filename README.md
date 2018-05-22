@@ -1,4 +1,4 @@
-# JavaScript library for working with ClearQuest OSLC API [![Build Status](https://travis-ci.org/dodash/cq-utils.svg?branch=master)](https://travis-ci.org/dodash/cq-utils)
+# JavaScript library for working with ClearQuest OSLC API [![Build Status](https://travis-ci.org/dodash/cq-utils.svg?branch=master)](https://travis-ci.org/dodash/cq-utils) [![Coverage Status](https://coveralls.io/repos/github/dodash/cq-utils/badge.svg?branch=master)](https://coveralls.io/github/dodash/cq-utils?branch=master)
 ## Functions
 
 <dl>
