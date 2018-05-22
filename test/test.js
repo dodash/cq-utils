@@ -5,7 +5,6 @@ describe(
 		'cqutil',
 		function() {
 			describe('getBasePath', function() {
-				console.log("hello1");
 				it('should return "http:://localhost:9876"', function() {
 					var basePath = getBasePath();
 					expect(basePath).to.equal('http:://localhost:9876');
@@ -24,16 +23,22 @@ describe(
 
 					var spy = sinon.spy(gadgets.window, 'adjustHeight');
 					var clock = sinon.useFakeTimers();
+
 					adjustHeight();
 					clock.tick(100);
+
 					spy.should.have.been.calledOnce;
+
+					spy.restore;
+					delete window.gadgets;
 					clock.restore();
 				});
 			});
 
 			describe('setVisibilityOf', function() {
-				var show, hide;
+				var show, hide, spy$, $backup;
 				beforeEach(function() {
+					$backup = window.$;
 					window.$ = function(arg) {
 						return {
 							show : show,
@@ -43,25 +48,31 @@ describe(
 
 					show = sinon.stub();
 					hide = sinon.stub();
+					sinon.spy(window, '$');
 				});
 
 				it('should call "$.show(div1)"', function() {
-					var spy$ = sinon.spy(window, '$');
 					setVisibilityOf("div1", true);
-					spy$.should.have.been.calledWith("#div1");
+
+					$.should.have.been.calledWith("#div1");
 					show.should.have.been.calledWith({
 						complete : adjustHeight
 					});
 				});
 
 				it('should call "$.hide(div1)"', function() {
-					var spy$ = sinon.spy(window, '$');
 					setVisibilityOf("div1", false);
-					spy$.should.have.been.calledWith("#div1");
+
+					$.should.have.been.calledWith("#div1");
 					hide.should.have.been.calledWith({
 						complete : adjustHeight
 					});
 				});
+
+				afterEach(function() {
+					$.restore;
+					window.$ = $backup;
+				})
 			});
 
 			describe('setLoading', function() {
@@ -73,27 +84,24 @@ describe(
 			});
 
 			describe('loadPrefs', function() {
-				var prefsMock;
-				beforeEach(function() {
+				it('should log "loadPrefs entry"', function() {
 					var prefs = {};
 					prefs.getString = function(prefName) {
 						return 'prefValue';
 					};
-
-					window.prefs = prefs; // <-- set it here
-					window.DEBUG = true;
-				});
-
-				it('should log "loadPrefs entry"', function() {
-					var spy = sinon.spy(console, 'log');
-					prefsMock = sinon.mock(prefs);
+					var temp = window.prefs;
+					window.prefs = prefs;
+					var prefsMock = sinon.mock(prefs);
 					prefsMock.expects('getString').withArgs('repo').returns(
 							'myrepo');
 					prefsMock.expects('getString').withArgs('db').returns(
 							'mydb');
+
 					loadPrefs();
-					prefsMock.restore();
+
 					prefsMock.verify();
+					prefsMock.restore();
+					window.prefs = temp;
 				});
 			});
 
@@ -110,7 +118,6 @@ describe(
 							var repoName = getRepoNameFromDbUrl("");
 							expect(repoName).to.equal('');
 						});
-
 					});
 
 			describe(
@@ -149,7 +156,6 @@ describe(
 									var initParamsStub = sinon.stub(window,
 											"initParams");
 									initParamsStub.callsFake(function() {
-										console.log("fake");
 										return {};
 									});
 									var makeRequestStub = sinon.stub(window,
@@ -172,22 +178,22 @@ describe(
 					function() {
 						before(function() {
 							window.gadgets = {
-									io : {
-										RequestParameters : {
-											AUTHORIZATION : 'authorization',
-											HEADERS : 'headers',
-											OAUTH_USE_TOKEN : 'oauth_use_token'
-										},
-										AuthorizationType : {
-											OAUTH : 'oauth'
-										}
-									}
-								};
-							window.prefs = {
-									getString : function(str) {
-										return str;
+								io : {
+									RequestParameters : {
+										AUTHORIZATION : 'authorization',
+										HEADERS : 'headers',
+										OAUTH_USE_TOKEN : 'oauth_use_token'
+									},
+									AuthorizationType : {
+										OAUTH : 'oauth'
 									}
 								}
+							};
+							window.prefs = {
+								getString : function(str) {
+									return str;
+								}
+							}
 						});
 
 						it(
@@ -251,7 +257,6 @@ describe(
 						var makeRequestStub;
 
 						before(function() {
-							console.log("beforeall");
 							cbStub = sinon.stub();
 							initParamsStub = sinon.stub(window, "initParams");
 							initParamsStub.callsFake(function() {
@@ -309,14 +314,11 @@ describe(
 						var makeRequestStub;
 
 						before(function() {
-							console.log("beforeall");
 							cbStub = sinon.stub();
 							initParamsStub = sinon.stub(window, "initParams");
 							initParamsStub.callsFake(function() {
-								console.log("callsFake");
 								return {
-									headers: {
-									}
+									headers : {}
 								};
 							});
 							makeRequestStub = sinon.stub(window, "makeRequest");
@@ -342,12 +344,15 @@ describe(
 									initParamsStub.should.have.been
 											.calledWith(false);
 									makeRequestStub.should.have.been
-											.calledWith('http://localhost:9080/cqweb/oslc/repo/9.0.0/db/SAMPL', cbStub, {
-												headers: {
-													Accept: "application/xml"
-												},
-												method: 'get'
-											});
+											.calledWith(
+													'http://localhost:9080/cqweb/oslc/repo/9.0.0/db/SAMPL',
+													cbStub,
+													{
+														headers : {
+															Accept : "application/xml"
+														},
+														method : 'get'
+													});
 								});
 						it(
 								'should call makeRequest with OSLCv2',
@@ -358,12 +363,15 @@ describe(
 									initParamsStub.should.have.been
 											.calledWith(true);
 									makeRequestStub.should.have.been
-											.calledWith('http://localhost:9080/cqweb/oslc/repo/9.0.0/db/SAMPL', cbStub, {
-												headers: {
-													Accept: "application/xml"
-												},
-												method: 'get'
-											});
+											.calledWith(
+													'http://localhost:9080/cqweb/oslc/repo/9.0.0/db/SAMPL',
+													cbStub,
+													{
+														headers : {
+															Accept : "application/xml"
+														},
+														method : 'get'
+													});
 								});
 
 						after(function() {
@@ -381,13 +389,10 @@ describe(
 						var makeRequestStub;
 
 						before(function() {
-							console.log("beforeall");
 							cbStub = sinon.stub();
 							initParamsStub = sinon.stub(window, "initParams");
 							initParamsStub.callsFake(function() {
-								console.log("callsFake");
-								return {
-									};
+								return {};
 							});
 							makeRequestStub = sinon.stub(window, "makeRequest");
 							window.gadgets = {
@@ -412,10 +417,12 @@ describe(
 									initParamsStub.should.have.been
 											.calledWith();
 									makeRequestStub.should.have.been
-											.calledWith('http://localhost:9080/cqweb/oslc/repo/9.0.0/db/SAMPL', cbStub, {
-												postData: 'postData',
-												method: 'post'
-											});
+											.calledWith(
+													'http://localhost:9080/cqweb/oslc/repo/9.0.0/db/SAMPL',
+													cbStub, {
+														postData : 'postData',
+														method : 'post'
+													});
 								});
 						it(
 								'should call makeRequest with POST method with postData ',
@@ -426,9 +433,11 @@ describe(
 									initParamsStub.should.have.been
 											.calledWith();
 									makeRequestStub.should.have.been
-											.calledWith('http://localhost:9080/cqweb/oslc/repo/9.0.0/db/SAMPL', cbStub, {
-												method: 'post'
-											});
+											.calledWith(
+													'http://localhost:9080/cqweb/oslc/repo/9.0.0/db/SAMPL',
+													cbStub, {
+														method : 'post'
+													});
 								});
 
 						after(function() {
@@ -438,53 +447,201 @@ describe(
 						});
 					});
 
-			describe("getOAuthFriendsApiUrl", function(){
-				it("should return ", function(){
-					var oAuthFriendsApiUrl = getOAuthFriendsApiUrl();
-					expect(oAuthFriendsApiUrl).to.be.equal("/app/api/rest/oAuthFriends?friendType=clearquest");
+			describe(
+					"getOAuthFriendsApiUrl",
+					function() {
+						it(
+								"should return ",
+								function() {
+									var oAuthFriendsApiUrl = getOAuthFriendsApiUrl();
+									expect(oAuthFriendsApiUrl).to.be
+											.equal("/app/api/rest/oAuthFriends?friendType=clearquest");
+								})
+					});
+
+			describe(
+					"checkIfFTSenabled",
+					function() {
+						var cbStub;
+						var doGetXMLStub;
+
+						beforeEach(function() {
+							cbStub = sinon.stub();
+							doGetXMLStub = sinon.stub(window, 'doGetXML');
+							doGetXMLStub.callsFake(function(dbUrl, callback) {
+								callback();
+							});
+						});
+
+						it(
+								"should call callback with true ",
+								function() {
+									var _handleCheckIfFTSenabledStub = sinon
+											.stub(window,
+													'_handleCheckIfFTSenabled');
+									_handleCheckIfFTSenabledStub
+											.callsFake(function(response,
+													callback) {
+												callback(true);
+											});
+									checkIfFTSenabled(
+											"http://localhost:9080/cqweb/oslc/repo/9.0.0/db/SAMPL",
+											cbStub);
+
+									doGetXMLStub.should.have.been.calledOnce;
+									_handleCheckIfFTSenabledStub.should.have.been.calledOnce;
+									cbStub.should.have.been.calledWith(true);
+									_handleCheckIfFTSenabledStub.restore();
+								});
+						it(
+								"should call callback with false ",
+								function() {
+									var _handleCheckIfFTSenabledStub = sinon
+											.stub(window,
+													'_handleCheckIfFTSenabled');
+									_handleCheckIfFTSenabledStub
+											.callsFake(function(response,
+													callback) {
+												callback(false);
+											});
+
+									checkIfFTSenabled(
+											"http://localhost:9080/cqweb/oslc/repo/9.0.0/db/SAMPL",
+											cbStub);
+
+									doGetXMLStub.should.have.been.calledOnce;
+									_handleCheckIfFTSenabledStub.should.have.been.calledOnce;
+									cbStub.should.have.been.calledWith(false);
+									_handleCheckIfFTSenabledStub.restore();
+								});
+
+						afterEach(function() {
+							doGetXMLStub.restore();
+						});
+					});
+
+			describe("getSchemaRepositories",
+					function() {
+						it("should call _doFetch",
+								function() {
+									var cbStub = sinon.stub();
+									var _doFetchStub = sinon.stub(window,
+											"_doFetch");
+									_doFetchStub.callsFake(function(url,
+											callback) {
+										callback("repositories");
+									});
+
+									getSchemaRepositories(
+											"http://localhost:9080/cqweb",
+											cbStub);
+
+									_doFetchStub.should.have.been.calledWith(
+											"http://localhost:9080/cqweb/oslc",
+											cbStub);
+									cbStub.should.have.been
+											.calledWith("repositories");
+
+									_doFetchStub.restore();
+								})
+					});
+
+			describe("getUserDatabases", function() {
+				it("should call _doFetch", function() {
+					var cbStub = sinon.stub();
+					var _doFetchStub = sinon.stub(window, "_doFetch");
+					_doFetchStub.callsFake(function(url, callback) {
+						callback("databases");
+					});
+
+					getUserDatabases(
+							"http://localhost:9080/cqweb/oslc/repo/9.0.0",
+							cbStub);
+
+					_doFetchStub.should.have.been.calledWith(
+							"http://localhost:9080/cqweb/oslc/repo/9.0.0",
+							cbStub);
+					cbStub.should.have.been.calledWith("databases");
+
+					_doFetchStub.restore();
 				})
 			});
 
-			describe("checkIfFTSenabled", function(){
-				var cbStub;
-				var doGetXMLStub;
+			describe(
+					"getRecordTypes",
+					function() {
+						it(
+								"should call _doFetch",
+								function() {
+									var cbStub = sinon.stub();
+									var _doFetchStub = sinon.stub(window,
+											"_doFetch");
+									_doFetchStub.callsFake(function(url,
+											callback) {
+										callback("recordTypes");
+									});
 
-				beforeEach(function() {
-					cbStub = sinon.stub();
-					doGetXMLStub = sinon.stub(window, 'doGetXML');
-					doGetXMLStub.callsFake(function(dbUrl, callback) {
-						callback();
+									getRecordTypes(
+											"http://localhost:9080/cqweb/oslc/repo/9.0.0/db/SAMPL",
+											cbStub);
+
+									_doFetchStub.should.have.been
+											.calledWith(
+													"http://localhost:9080/cqweb/oslc/repo/9.0.0/db/SAMPL/record-type",
+													cbStub);
+									cbStub.should.have.been
+											.calledWith("recordTypes");
+
+									_doFetchStub.restore();
+								})
 					});
-				});
 
-				it("should call callback with true ", function(){
-					var _handleCheckIfFTSenabledStub = sinon.stub(window, '_handleCheckIfFTSenabled');
-					_handleCheckIfFTSenabledStub.callsFake(function(response, callback) {
-						callback(true);
+			describe(
+					"getRecord",
+					function() {
+						var cbStub;
+						var _doFetchStub;
+
+						beforeEach(function() {
+							cbStub = sinon.stub();
+							_doFetchStub = sinon.stub(window, "_doFetch");
+							_doFetchStub.callsFake(function(url, callback) {
+								callback("record");
+							});
+						});
+
+						it(
+								"should call _doFetch with record type",
+								function() {
+									getRecord(
+											"http://localhost:9080/cqweb/oslc/repo/9.0.0/db/SAMPL",
+											"defect", "1234", cbStub);
+
+									_doFetchStub.should.have.been
+											.calledWith(
+													"http://localhost:9080/cqweb/oslc/repo/9.0.0/db/SAMPL/record/?rcm.type=defect&rcm.name=1234",
+													cbStub);
+									cbStub.should.have.been
+											.calledWith("record");
+								});
+
+						it(
+								"should call _doFetch without record type",
+								function() {
+									getRecord(
+											"http://localhost:9080/cqweb/oslc/repo/9.0.0/db/SAMPL",
+											null, "1234", cbStub);
+
+									_doFetchStub.should.have.been
+											.calledWith(
+													"http://localhost:9080/cqweb/oslc/repo/9.0.0/db/SAMPL/record/?rcm.name=1234",
+													cbStub);
+									cbStub.should.have.been
+											.calledWith("record");
+								});
+
+						afterEach(function() {
+							_doFetchStub.restore();
+						});
 					});
-					checkIfFTSenabled("http://localhost:9080/cqweb/oslc/repo/9.0.0/db/SAMPL", cbStub);
-
-					doGetXMLStub.should.have.been.calledOnce;
-					_handleCheckIfFTSenabledStub.should.have.been.calledOnce;
-					cbStub.should.have.been.calledWith(true);
-					_handleCheckIfFTSenabledStub.restore();
-				});
-				it("should call callback with false ", function(){
-					var _handleCheckIfFTSenabledStub = sinon.stub(window, '_handleCheckIfFTSenabled');
-					_handleCheckIfFTSenabledStub.callsFake(function(response, callback) {
-						callback(false);
-					});
-
-					checkIfFTSenabled("http://localhost:9080/cqweb/oslc/repo/9.0.0/db/SAMPL", cbStub);
-
-					doGetXMLStub.should.have.been.calledOnce;
-					_handleCheckIfFTSenabledStub.should.have.been.calledOnce;
-					cbStub.should.have.been.calledWith(false);
-					_handleCheckIfFTSenabledStub.restore();
-				});
-
-				afterEach(function() {
-					doGetXMLStub.restore();
-				});
-			});
 		});

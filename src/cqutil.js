@@ -178,11 +178,9 @@ function doGet(url, callback, isOSLCv2) {
 function doGetXML(url, callback, isOSLCv2) {
     DEBUG&&console.log("doGetXML url isOSLCv2", url, isOSLCv2);
     var params = initParams(isOSLCv2);
-    console.log("doGetXML params1", params);
     params[gadgets.io.RequestParameters.HEADERS].Accept = "application/xml";
     params[gadgets.io.RequestParameters.METHOD] = gadgets.io.MethodType.GET;
     DEBUG&&console.log("doGetXML params[gadgets.io.RequestParameters.HEADERS].Accept", params[gadgets.io.RequestParameters.HEADERS].Accept);
-    console.log("doGetXML params2", params);
     makeRequest(url, callback, params);
 }
 
@@ -621,7 +619,7 @@ function getRecordTypes(dbUrl, callback){
 function getRecord(dbUrl, recordType, name, callback){
 	DEBUG&&console.log("getRecord: dbUrl, recordType, name, callback", dbUrl, recordType, name, callback);
 	var url;
-	if(typeof recordType != 'undefined'){
+	if(recordType){
 		url = dbUrl + "/record/?rcm.type=" + recordType + "&rcm.name=" + encodeURIComponent(name);
 	}else{
 		url = dbUrl + "/record/?rcm.name=" + encodeURIComponent(name);
